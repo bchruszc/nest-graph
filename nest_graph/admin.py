@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import DeviceState, Device, UserProfile
+from nest_graph.models import DeviceState, Device, UserProfile
 
 class DeviceAdmin(admin.ModelAdmin):
     pass

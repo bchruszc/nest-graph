@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 import nest
 import pickle
 import datetime
+import base64
 
 class Command(BaseCommand):
     def _read_nest(self):
@@ -19,8 +20,8 @@ class Command(BaseCommand):
                 
                 ds.device = d
                 
-                ds.state_pickle = pickle.dumps(napi._status)
-                ds.weather_pickle = pickle.dumps(napi.structures[0].weather)
+                ds.state_pickle = base64.b64encode(pickle.dumps(napi._status))
+                ds.weather_pickle = base64.b64encode(pickle.dumps(napi.structures[0].weather))
                 
                 # Timestamp from when the state snapshot was taken
                 ds.state_timestamp = datetime.datetime.now()

@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-import views
+import nest_graph.views as views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),

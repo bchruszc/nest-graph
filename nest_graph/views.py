@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.template import loader
 
-from models import DeviceState
+from nest_graph.models import DeviceState
 
 import nest
 import pickle
