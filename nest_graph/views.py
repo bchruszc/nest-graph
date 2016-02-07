@@ -7,10 +7,11 @@ import nest
 import pickle
 import datetime
 
-def index(request):
+def dashboard(request):
     if request.user.is_authenticated():
         template = loader.get_template('nest_graph/overview.html')
         context = {
+            'page_header' : 'Page Header.',
             'user_profile': request.user.profile,
             'devices': request.user.profile.devices,
         }

@@ -19,7 +19,9 @@ from django.contrib import admin
 import nest_graph.views as views
 
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
+    url(r'^$', views.dashboard, name='index'),
+    url(r'^dashboard/', views.dashboard, name='dashboard'),
+
     #url(r'^read_nest/', views.read_nest, name='read_nest'),
     url(r'^admin/', admin.site.urls),
 ]
