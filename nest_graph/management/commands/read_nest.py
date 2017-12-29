@@ -7,28 +7,42 @@ import pickle
 import datetime
 import base64
 
+client_id = 'e639b04d-d513-4d54-b54a-6848a737cbfc'
+client_secret = 'jXKit8QM0ySq7z8dlkK65hvPX'
+access_token_cache_file = 'nest.json'
+
 class Command(BaseCommand):
     def _read_nest(self):
+
+        napi = nest.Nest(client_id=client_id, client_secret=client_secret,
+                         access_token_cache_file=access_token_cache_file)
+
+        if napi.authorization_required:
+            print('Go to ' + napi.authorize_url + ' to authorize, then enter PIN below')
+            pin = input("PIN: ")
+            napi.request_token(pin)
+
         for u in User.objects.all():
             for d in u.profile.devices.all():
-                napi = nest.Nest(u.profile.nest_username, u.profile.nest_password)
-                
+
+                #u.profile.nest_username, u.profile.nest_password)
+
                 # napi._status is essentially the raw data, in case we want is again laster
-#                print 'Starting Nest read...'
-            
+                #                print 'Starting Nest read...'
+
                 ds = DeviceState()
-                
+
                 ds.device = d
-                
+
                 ds.state_pickle = base64.b64encode(pickle.dumps(napi._status))
-                ds.weather_pickle = base64.b64encode(pickle.dumps(napi.structures[0].weather))
-                
+#                ds.weather_pickle = base64.b64encode(pickle.dumps(napi.structures[0].weather))
+
                 # Timestamp from when the state snapshot was taken
                 ds.state_timestamp = datetime.datetime.now()
-                
+
                 # Fields that are likely of greatest interest
-                device = napi.devices[0]
-                
+                device = napi.thermostats[0]
+
                 ds.name = device.name
                 ds.where = device.where
                 ds.mode = device.mode
@@ -36,24 +50,14 @@ class Command(BaseCommand):
                 ds.temperature = device.temperature
                 ds.humidity = device.humidity
                 ds.target = device.target
-                ds.away_heat = device.away_temperature[0]
-                ds.away_cool = device.away_temperature[1]
-                
-                ds.hvac_ac_state = device.hvac_ac_state
-                ds.hvac_cool_x2_state = device.hvac_cool_x2_state
-                ds.hvac_heater_state = device.hvac_heater_state
-                ds.hvac_aux_heater_state = device.hvac_aux_heater_state
-                ds.hvac_heat_x2_state = device.hvac_heat_x2_state
-                ds.hvac_heat_x3_state = device.hvac_heat_x3_state
-                ds.hvac_alt_heat_state = device.hvac_alt_heat_state
-                ds.hvac_alt_heat_x2_state = device.hvac_alt_heat_x2_state
-                ds.hvac_emer_heat_state = device.hvac_emer_heat_state
-                
+                # ds.away_heat = device.away_temperature[0]
+                # ds.away_cool = device.away_temperature[1]
+
+                ds.hvac_state = device.hvac_state
+
                 ds.online = device.online
-                ds.last_ip = device.last_ip
-                ds.local_ip = device.local_ip
                 ds.last_connection = device.last_connection
-                
+
                 ds.save()
     
     

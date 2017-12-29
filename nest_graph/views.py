@@ -16,8 +16,6 @@ def dashboard(request):
             'devices': request.user.profile.devices,
         }
         return HttpResponse(template.render(context, request))
-        
-        return HttpResponse("You're logged in as " + request.user.profile.friendly_name)
     else:
         return HttpResponse("You're not logged in.")
 

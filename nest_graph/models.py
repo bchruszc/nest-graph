@@ -27,15 +27,8 @@ class Device(models.Model):
 
 
 class DeviceState(models.Model):
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
     device = models.ForeignKey(Device, on_delete=models.CASCADE, related_name='states')
 
-    # A pickled representation of the 'raw' Nest response provided by our libraries
-    state_pickle = models.CharField(max_length=100000, default='')
-    
-    # A pickled version of the complete weather object
-    weather_pickle = models.CharField(max_length=100000, default='')
-    
     # Timestamp from when the state snapshot was taken
     state_timestamp = models.DateTimeField('state timestamp')
     
@@ -49,22 +42,10 @@ class DeviceState(models.Model):
     temperature = models.FloatField()
     humidity = models.FloatField()
     target = models.FloatField()
-    away_heat = models.FloatField()
-    away_cool = models.FloatField()
-    
-    hvac_ac_state = models.BooleanField()
-    hvac_cool_x2_state = models.BooleanField()
-    hvac_heater_state = models.BooleanField()
-    hvac_aux_heater_state = models.BooleanField()
-    hvac_heat_x2_state = models.BooleanField()
-    hvac_heat_x3_state = models.BooleanField()
-    hvac_alt_heat_state = models.BooleanField()
-    hvac_alt_heat_x2_state = models.BooleanField()
-    hvac_emer_heat_state = models.BooleanField()
-    
+
+    hvac_state = models.CharField(max_length=100, default='unknown')
+
     online = models.BooleanField()
-    last_ip = models.CharField(max_length=100)
-    local_ip = models.CharField(max_length=100)
     last_connection = models.CharField(max_length=100)
     
     error_code = models.CharField(max_length=100)
