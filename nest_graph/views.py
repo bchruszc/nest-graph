@@ -92,7 +92,8 @@ def states_to_graph_ranges(states):
 
         current_value = s.hvac_state
 
-    ranges.append({'start': range_start, 'end': range_end, 'class': ('graph-' + current_value)})
+    if range_end:   # Handle case where there are no points
+        ranges.append({'start': range_start, 'end': range_end, 'class': ('graph-' + current_value)})
 
     def json_serial(obj):
         """JSON serializer for objects not serializable by default json code"""
