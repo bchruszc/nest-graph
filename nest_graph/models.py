@@ -12,8 +12,8 @@ class UserProfile(models.Model):
     friendly_name = models.CharField(max_length=40, default='Friend')
 
     # Required when a user is requesting to pair
-    nest_oauth_state = models.CharField(max_length=40, default='', null=True)
-    nest_oauth_token = models.CharField(max_length=256, default='', null=True)  # Tokens are 146 chars today
+    nest_oauth_state = models.CharField(max_length=40, default='', blank=True)
+    nest_oauth_token = models.CharField(max_length=256, default='', blank=True)  # Tokens are 146 chars today
 
     def __str__(self):
         return '%s (%s)' % (self.friendly_name, self.user.username)
