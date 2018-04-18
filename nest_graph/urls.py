@@ -16,12 +16,19 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
+
 import nest_graph.views as views
 
 urlpatterns = [
     url(r'^$', views.dashboard, name='index'),
     url(r'^dashboard/', views.dashboard, name='dashboard'),
 
-    #url(r'^read_nest/', views.read_nest, name='read_nest'),
+    url(r'^devices/', views.devices, name='devices'),
+    url(r'^nest_callback/', views.nest_callback, name='nest_callback'),
+
+    url(r'^login/$', auth_views.login, name='login'),
+    url(r'^logout/$', auth_views.logout, name='logout'),
+
     url(r'^admin/', admin.site.urls),
 ]

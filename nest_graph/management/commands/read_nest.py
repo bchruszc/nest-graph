@@ -3,45 +3,46 @@ from nest_graph.models import DeviceState
 from django.contrib.auth.models import User
 
 import nest
-import pickle
 import datetime
-import base64
 
 client_id = 'e639b04d-d513-4d54-b54a-6848a737cbfc'
 client_secret = 'jXKit8QM0ySq7z8dlkK65hvPX'
 access_token_cache_file = 'nest.json'
 
+
 class Command(BaseCommand):
     def _read_nest(self):
 
-        napi = nest.Nest(client_id=client_id, client_secret=client_secret,
-                         access_token_cache_file=access_token_cache_file)
-
-        if napi.authorization_required:
-            print('Go to ' + napi.authorize_url + ' to authorize, then enter PIN below')
-            pin = input("PIN: ")
-            napi.request_token(pin)
-
         for u in User.objects.all():
+
+            if not u.profile.nest_oauth_token:
+                continue
+
+            napi = nest.Nest(client_id=client_id, client_secret=client_secret, access_token=u.profile.nest_oauth_token)
+            thermostats = napi.thermostats
+
             for d in u.profile.devices.all():
+                device = None
+                for t in thermostats:
+                    if t.device_id == d.device_id:
+                        device = t
+                        break
 
-                #u.profile.nest_username, u.profile.nest_password)
-
-                # napi._status is essentially the raw data, in case we want is again laster
-                #                print 'Starting Nest read...'
+                if not device:
+                    print('Device not found')
+                    continue
 
                 ds = DeviceState()
 
                 ds.device = d
 
-                ds.state_pickle = base64.b64encode(pickle.dumps(napi._status))
-#                ds.weather_pickle = base64.b64encode(pickle.dumps(napi.structures[0].weather))
+                # ds.state_pickle = base64.b64encode(pickle.dumps(napi._status))
+                #                ds.weather_pickle = base64.b64encode(pickle.dumps(napi.structures[0].weather))
 
                 # Timestamp from when the state snapshot was taken
                 ds.state_timestamp = datetime.datetime.now()
 
                 # Fields that are likely of greatest interest
-                device = napi.thermostats[0]
 
                 ds.name = device.name
                 ds.where = device.where
@@ -59,13 +60,9 @@ class Command(BaseCommand):
                 ds.last_connection = device.last_connection
 
                 ds.save()
-    
-    
-    
-                
+
     def handle(self, *args, **options):
         self._read_nest()
-        
 
     '''
     temperature = models.FloatField()
@@ -92,11 +89,7 @@ class Command(BaseCommand):
     error_code = models.CharField(max_length=100)
     battery_level = models.CharField(max_length=100)   
     '''
-    
-    
-    
-    
-    
+
     '''
     for k in dir(napi):
         #print k
@@ -113,5 +106,4 @@ class Command(BaseCommand):
             contents += 'Structure %s' % structure.name + '<br>'
             contents += '&nbsp&nbsp&nbsp&nbspAway: %s' % structure.away + '<br>'
             contents += '&nbsp&nbsp&nbsp&nbspDevices:' + '<br>'
-    ''' 
-   
+    '''

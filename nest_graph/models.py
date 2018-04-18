@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-#from nest_graph import settings
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(
@@ -8,11 +8,12 @@ class UserProfile(models.Model):
         on_delete=models.CASCADE,
         related_name='profile',
     )
-    
+
     friendly_name = models.CharField(max_length=40, default='Friend')
-    
-    nest_username = models.CharField(max_length=40, default='')
-    nest_password = models.CharField(max_length=40, default='') #, widget=models.PasswordInput)
+
+    # Required when a user is requesting to pair
+    nest_oauth_state = models.CharField(max_length=40, default='')
+    nest_oauth_token = models.CharField(max_length=256, default='')  # Tokens are 146 chars today
 
     def __str__(self):
         return '%s (%s)' % (self.friendly_name, self.user.username)
@@ -20,10 +21,12 @@ class UserProfile(models.Model):
 
 class Device(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='devices')
-    device_name = models.CharField(max_length=40, default='NEST')
+
+    name = models.CharField(max_length=256, default='Unknown Thermostat')
+    device_id = models.CharField(max_length=40)
 
     def __str__(self):
-        return '%s''s device: %s' % (self.user_profile.friendly_name, self.device_name)
+        return '%s''s device: %s' % (self.user_profile.friendly_name, self.name)
 
 
 class DeviceState(models.Model):
@@ -31,14 +34,14 @@ class DeviceState(models.Model):
 
     # Timestamp from when the state snapshot was taken
     state_timestamp = models.DateTimeField('state timestamp')
-    
+
     name = models.CharField(max_length=100, default='')
     where = models.CharField(max_length=100, default='')
-    
+
     # Fields that are likely of greatest interest
     mode = models.CharField(max_length=100)
     fan = models.CharField(max_length=100)
-    
+
     temperature = models.FloatField()
     humidity = models.FloatField()
     target = models.FloatField()
@@ -47,12 +50,13 @@ class DeviceState(models.Model):
 
     online = models.BooleanField()
     last_connection = models.CharField(max_length=100)
-    
+
     error_code = models.CharField(max_length=100)
     battery_level = models.CharField(max_length=100)
-    
+
     def __str__(self):
         return 'Device State at %s' % (str(self.state_timestamp))
+
     '''
      print '            Mode     : %s' % device.mode
         print '            Fan      : %s' % device.fan

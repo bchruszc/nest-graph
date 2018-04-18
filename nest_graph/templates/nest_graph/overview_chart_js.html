@@ -13,9 +13,7 @@ Overview
 
           <!-- Daily Graph -->
           <div class="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col">
-            <div id="daily_graph" width="400">
-                <svg width="400"> </svg>
-            </div>
+            <canvas id="daily_graph" width="400" height="250"></canvas>
           </div>
 
           <!-- Sample Card -->
@@ -73,56 +71,113 @@ Overview
 {% endblock %}
 
 {% block extra_script %}
-
-<link rel="stylesheet" href="/static/css/c3.css"></script>
-
-<script src="/static/js/d3.js"></script>
-<script src="/static/js/c3.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.js"></script>
 <script type = 'text/javascript'>
+  var timeFormat = 'MM/DD/YYYY HH:mm';
+
+  function randomNumber(min, max){
+    return Math.random() * (max-min) + min;
+  }
+
+  function newDate(days) {
+      return moment().add(days, 'd').toDate();
+  }
+
+  function newDateString(days) {
+      return moment().add(days, 'd').format(timeFormat);
+  }
+
+  function heatColour(temp) {
+    if(temp >= 20.0) {
+      console.log(temp + ' red');
+      return 'red';
+    }
+
+    if(temp <= 15.0) {
+      console.log(temp + ' blue');
+      return 'blue';
+    }
+    
+console.log(temp + ' grey');
+    return 'grey';
+  }
 
 
-var data = {{ graph_columns|safe }}
-var regions = {{ graph_regions|safe }}
+  var ctx = document.getElementById("daily_graph").getContext('2d');
+   var color = Chart.helpers.color;
 
-console.log(data)
-console.log(regions)
+  var i = 0;
+  var date = moment();
+  var labels = [date.toDate()];
+  var temps = [21.0];
+  var temp = 21.0;
 
-var chart = c3.generate({
-    bindto: '#daily_graph',
+  var gradientStroke = ctx.createLinearGradient(0, 0, 640, 0);
+  gradientStroke.addColorStop(0, heatColour(21.0));
+
+  while (i < 100) {
+    i = i+1;
+    date = date.clone().add(1, 'm');
+    temp = randomNumber(temp - 1.0, temp + 1.0);
+
+    if(Math.random() > 0.5){
+        gradientStroke.addColorStop(i / 100.0, heatColour(temp));
+
+      labels.push(date.toDate());
+      temps.push({
+        x: date.toDate(),
+        y: temp,
+        pointBackgroundColor: heatColour(temp)
+      });
+      }
+  }
+
+    console.log(temps)
+
+
+
+  var myChart = new Chart(ctx, {
+    type: 'line',
     data: {
-        x: 'x',
-        xFormat: '%Y-%m-%d %H:%M:%S',
-//        xFormat: '%Y%m%d', // 'xFormat' can be used as custom format of 'x'
-        columns: data,
-        types: {
-            Temperature: 'spline',
-            Target: 'step'
-        },
-    },
+        labels: labels,
+        datasets: [{
+            label: 'Actual Temperature',
+            borderColor:               gradientStroke,
+            pointBorderColor:          gradientStroke,
+            pointBackgroundColor:      gradientStroke,
+            pointHoverBackgroundColor: gradientStroke,
+            pointHoverBorderColor:     gradientStroke,
+            fill: true,
+            backgroundColor: gradientStroke,
 
-    axis: {
-        x: {
-            type: 'timeseries',
-            tick: {
-                format: '%Y-%m-%d %H:%M:%S'
-            }
-        },
-        y: {
-            max: 24,
-            min: 16,
-            // Range includes padding, set 0 if no padding needed
-            // padding: {top:0, bottom:0}
+            data: temps,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }],
+            xAxes: [{
+                type: 'time',
+                time: {
+                    format: timeFormat,
+                    tooltipFormat: 'll HH:mm',
+                    unit: 'minute'
+                },
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: "Time",
+                }
+            }]
         }
-    },
-
-    color: {
-        pattern: ['grey', 'red']
-    },
-    point: {
-        show: false
-    },
-    regions: regions
+    }
 });
+
 </script>
 {% endblock %}

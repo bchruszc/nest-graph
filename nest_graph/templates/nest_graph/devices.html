@@ -1,0 +1,56 @@
+{% extends "nest_graph/base.html" %}
+
+{% block title %}
+Devices
+{% endblock %}
+
+{% block content %}
+        <div class="mdl-grid demo-content">
+          <!-- Banner across the top - current status -->
+          <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+            <div class="mdl-card mdl-cell mdl-cell--12-col">
+              <div class="mdl-card__supporting-text">
+                <h4>Technology</h4>
+                Dolore ex deserunt aute fugiat aute nulla ea sunt aliqua nisi cupidatat eu. Nostrud in laboris labore nisi amet do dolor eu fugiat consectetur elit cillum esse. Pariatur occaecat nisi laboris tempor laboris eiusmod qui id Lorem esse commodo in. Exercitation aute dolore deserunt culpa consequat elit labore incididunt elit anim.
+              </div>
+              <div class="mdl-card__actions">
+                <a href="#" class="mdl-button">Read our features</a>
+              </div>
+            </div>
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="btn3">
+              <i class="material-icons">more_vert</i>
+            </button>
+            <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right" for="btn3">
+              <li class="mdl-menu__item">Lorem</li>
+              <li class="mdl-menu__item" disabled>Ipsum</li>
+              <li class="mdl-menu__item">Dolor</li>
+            </ul>
+          </section>
+
+          <div id="current_status" class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
+            <h3>Nest Account</h3>
+            {% if not user_profile.nest_oauth_token %}
+                <p>No Nest account linked.</p>
+                <p><a href="https://home.nest.com/login/oauth2?client_id=e639b04d-d513-4d54-b54a-6848a737cbfc&state={{ oauth_state }}">Click here to link</a></p>
+            {% else %}
+                <p>Linked to Nest account.</p>
+                <p><a>Click here to remove link</a></p>
+            {% endif %}
+          </div>
+
+            {% for d in devices %}
+
+          <!-- Thermostat Card -->
+          <div class="demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
+            <div class="demo-updates mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--12-col-desktop">
+              <div class="mdl-card__title mdl-card--expand mdl-color--teal-300">
+                <h2 class="mdl-card__title-text">{{ d.name }}</h2>
+              </div>
+            </div>
+            <div class="demo-separator mdl-cell--1-col"></div>
+          </div>
+          {% endfor %}
+
+        </div>
+
+{% endblock %}

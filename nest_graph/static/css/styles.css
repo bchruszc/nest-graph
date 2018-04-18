@@ -217,3 +217,15 @@ _:-ms-input-placeholder, :root .demo-graph {
 #daily_graph svg {
   height: 400px;
 }
+
+.c3-region.graph-off {
+  fill: white;
+}
+
+.c3-region.graph-heating {
+  fill: red;
+}
+
+.c3-region.graph-cooling {
+  fill: blue;
+}
